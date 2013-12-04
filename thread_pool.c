@@ -1,6 +1,7 @@
-#include <thread_pool.h>
-
-static void * thread_pool_entrance(void *arg)
+#include "thread_pool.h"
+#include <pthread.h>
+thread_pool *pool = NULL;
+void * thread_pool_entrance(void *arg)
 {
 	int thread_id = (int)arg;
 	printf("thread %d is created\n",thread_id);
@@ -61,15 +62,14 @@ int thread_pool_init(int thread_pool_size)
 		ret = pthread_create(&(pool->thread_queue[i]), NULL, thread_pool_entrance, (void *)i);
 		if(ret < 0)
 		{
-			result = -1;
 			printf("thread create error!!!\n");
 			thread_pool_destroy();//注意销毁，避免内存泄漏
 			return -1;
 		}
 	}
 
-	pthread_mutex_init(&(pool->queue_mutex));
-	pthread_cond_init(&(pool->queue_cond));
+	pthread_mutex_init(&(pool->queue_mutex), NULL);
+	pthread_cond_init(&(pool->queue_cond), NULL);
 
 	return 0;
 }
@@ -79,8 +79,8 @@ typedef void *(*taskfunc)(void *arg);
 int thread_pool_add_task(taskfunc func, void *arg)
 {
 	task *newtask;
-	newtask = (task *)mallc(sizeof(task));
-	newtask->taskfunc = taskfunc;
+	newtask = (task *)malloc(sizeof(task));
+	newtask->taskfunc = func;
 	newtask->arg = arg;
 	newtask->next = NULL;
 
@@ -123,8 +123,8 @@ int thread_pool_destroy()
 		pool->task_queue_head = pool->task_queue_head->next;
 		free(temp);
 	}
-	pool->task_queue_head = NULL；
-	pool->task_queue_end = NULL；
+	//pool->task_queue_head = NULL；
+	//pool->task_queue_end = NULL；
 
 	//销毁线程队列
 	free(pool->thread_queue);
@@ -138,4 +138,3 @@ int thread_pool_destroy()
 
 	return 0;
 }
-
