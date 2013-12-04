@@ -9,7 +9,7 @@
 
 typedef struct task
 {
-	void *(*taskfunc)(void *arg, int thread_id);//声明一个函数指针
+	void *(*taskfunc)(void *arg);//声明一个函数指针
 	void *arg;//函数的参数
 	struct task *next;
 }task;
@@ -35,9 +35,9 @@ typedef struct thread_pool
 extern "C"{
 #endif
 
-extern thread_pool * g_thread_pool;
+extern thread_pool *pool;
 extern int thread_pool_init(int thread_pool_size);
-extern void * thread_pool_entrance(void *arg);
+//extern void * thread_pool_entrance(void *arg);
 extern int thread_pool_add_task(void *(*taskfunc)(void *arg), void *arg);
 extern int thread_pool_destroy();
 
