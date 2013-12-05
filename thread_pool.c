@@ -1,7 +1,7 @@
 #include "thread_pool.h"
 #include <pthread.h>
 thread_pool *pool = NULL;
-void * thread_pool_entrance(void *arg)
+static void * thread_pool_entrance(void *arg)
 {
 	int thread_id = (int)arg;
 	printf("thread %d is created\n",thread_id);
